@@ -1,0 +1,50 @@
+# Two realistic rows: one electronics listing (MacBook Pro) and one
+# e-bike listing, so model/scoring tests have real-shaped data to work
+# against without every test needing to build its own from scratch.
+macbook_pro_ebay:
+  source: ebay
+  listing_id: "111222333"
+  title: 'Apple MacBook Pro 14" M5 Max 128GB 2TB - Space Black'
+  price_usd: 4599.0
+  currency: USD
+  url: https://www.ebay.com/itm/111222333
+  condition: Used
+  ram_gb: 128
+  storage_gb: 2048
+  screen_size: 14.0
+  chip: M5 Max
+  cpu_cores: 16
+  gpu_cores: 40
+  deal_score: 78.5
+  is_great_deal: true
+  first_seen_at: <%= 2.days.ago.to_formatted_s(:db) %>
+  last_seen_at: <%= 1.hour.ago.to_formatted_s(:db) %>
+  is_active: true
+  product_type: electronics
+  search_name: MacBook Pro
+
+ebike_offerup:
+  source: offerup
+  listing_id: "ob-9988"
+  title: "Lectric XPedition 20x4 Fat Tire Folding E-Bike 48V 20Ah 750W"
+  price_usd: 950.0
+  currency: USD
+  url: https://offerup.com/item/detail/ob-9988
+  condition: Used
+  brand: Lectric
+  wheel_size_in: 20.0
+  fat_tire: true
+  step_through: false
+  folding: true
+  battery_voltage: 48
+  battery_ah: 20.0
+  battery_wh: 960.0
+  motor_watts_nominal: 750
+  weight_capacity_lb: 350
+  deal_score: 62.0
+  is_great_deal: false
+  first_seen_at: <%= 3.days.ago.to_formatted_s(:db) %>
+  last_seen_at: <%= 1.hour.ago.to_formatted_s(:db) %>
+  is_active: true
+  product_type: ebike
+  search_name: Folding step-through commuter e-bike

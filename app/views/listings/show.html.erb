@@ -1,0 +1,47 @@
+<%# Sets the browser tab title for just this page. %>
+<% content_for :title, "#{@listing.title.to_s.truncate(50)} - Price History" %>
+
+<div class="w-full pb-16">
+  <%= link_to "← Back to dashboard", listings_path, class: "text-sm text-gray-500 hover:text-gray-700" %>
+
+  <h1 class="mt-2 text-xl font-bold text-gray-900"><%= @listing.title %></h1>
+
+  <%# The same score badge and key facts shown on the dashboard row, just bigger, plus the direct link out to the real marketplace listing. %>
+  <div class="mt-4 flex flex-wrap items-center gap-3">
+    <span class="inline-block rounded px-2 py-1 text-sm font-semibold <%= @listing.is_great_deal? ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-700" %>">
+      <%= @listing.deal_score ? number_with_precision(@listing.deal_score, precision: 0) : "?" %>/100
+    </span>
+    <span class="text-lg font-semibold text-gray-900">$<%= number_with_delimiter(@listing.price_usd.round) %></span>
+    <span class="text-sm text-gray-600"><%= @listing.source.titleize %> · <%= @listing.search_name %></span>
+    <% if @listing.condition.present? %>
+      <span class="text-sm text-gray-600"><%= @listing.condition %></span>
+    <% end %>
+    <%= link_to "View on #{@listing.source.titleize} →", @listing.url, target: "_blank", rel: "noopener", class: "text-sm text-blue-700 hover:underline" %>
+  </div>
+
+  <h2 class="mt-8 text-lg font-semibold text-gray-900">Price history</h2>
+  <p class="mt-1 text-sm text-gray-600">Every price this listing has actually been observed at -- a new row only gets added when the price is new or has changed, not on every single scrape.</p>
+
+  <% if @price_histories.any? %>
+    <%# A plain CSS bar chart -- each bar's width is this price's position between the cheapest and priciest point ever seen, so a glance shows whether the trend is climbing or falling. No JavaScript chart library needed for something this simple. %>
+    <% min_price = @price_histories.map(&:price_usd).min %>
+    <% max_price = @price_histories.map(&:price_usd).max %>
+    <% price_range = (max_price - min_price).zero? ? 1.0 : (max_price - min_price) %>
+
+    <div class="mt-4 space-y-1.5">
+      <% @price_histories.each do |point| %>
+        <%# The bar always shows at least a sliver (15%) even at the cheapest point ever seen, so a single-price history still renders a visible bar instead of nothing. %>
+        <% bar_percent = 15 + (((point.price_usd - min_price) / price_range) * 85) %>
+        <div class="flex items-center gap-3 text-sm">
+          <span class="w-36 shrink-0 text-gray-500"><%= point.recorded_at.strftime("%b %-d, %Y %-I:%M%p") %></span>
+          <div class="h-4 flex-1 rounded bg-gray-100">
+            <div class="h-4 rounded bg-blue-500" style="width: <%= bar_percent.round(1) %>%"></div>
+          </div>
+          <span class="w-20 shrink-0 text-right font-medium text-gray-900">$<%= number_with_delimiter(point.price_usd.round) %></span>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="mt-4 text-sm text-gray-500">No price history recorded yet.</p>
+  <% end %>
+</div>

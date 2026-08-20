@@ -1,0 +1,12 @@
+# A short, oldest-to-newest price timeline for the MacBook Pro fixture
+# listing above -- lets tests check the price-history view/ordering
+# without each one having to build its own history from scratch.
+first_price:
+  listing: macbook_pro_ebay
+  price_usd: 4799.0
+  recorded_at: <%= 2.days.ago.to_formatted_s(:db) %>
+
+dropped_price:
+  listing: macbook_pro_ebay
+  price_usd: 4599.0
+  recorded_at: <%= 1.hour.ago.to_formatted_s(:db) %>

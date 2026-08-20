@@ -1,0 +1,38 @@
+# examples:
+#   periodic_cleanup:
+#     class: CleanSoftDeletedRecordsJob
+#     queue: background
+#     args: [ 1000, { batch_size: 500 } ]
+#     schedule: every hour
+#   periodic_cleanup_with_command:
+#     command: "SoftDeletedRecord.due.delete_all"
+#     priority: 2
+#     schedule: at 5am every day
+
+production:
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+  # Re-creates the Python project's own schedule
+  # (`schedule.cron_utc: "0 13 * * *"` in config.yaml, and
+  # .github/workflows/scrape.yml's cron trigger) inside the Rails app
+  # itself instead of relying on an external cron job -- fires once a
+  # day at 13:00 UTC, which is 6am America/Phoenix (Arizona doesn't
+  # observe DST, so this stays correct year-round with no adjustment).
+  scrape_listings:
+    class: ScrapeListingsJob
+    queue: default
+    schedule: "0 13 * * *"
+
+# The `staging` Rails environment (config/environments/staging.rb) is
+# this app's equivalent of the Python project's separate staging
+# GitHub Actions workflow -- same real code, same real scheduler, but
+# posting to a throwaway Discord webhook and writing to its own SQLite
+# database file (config/database.yml already gives every Rails
+# environment a separate database automatically) instead of touching
+# production. See the README's "Environments" section.
+staging:
+  scrape_listings:
+    class: ScrapeListingsJob
+    queue: default
+    schedule: "0 13 * * *"
